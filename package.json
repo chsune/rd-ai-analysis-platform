@@ -1,0 +1,28 @@
+{
+  "name": "rd-ai-analysis-platform",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build && node scripts/build-worker.mjs",
+    "build:fc": "node scripts/build-fc.mjs",
+    "start": "next start -p 3000",
+    "test": "tsx tests/parser.test.ts"
+  },
+  "dependencies": {
+    "typescript": "^5.8.3",
+    "next": "^15.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "lucide-react": "^0.468.0",
+    "xlsx": "^0.18.5",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "isomorphic-git": "^1.33.0",
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tsx": "^4.20.4"
+  }
+}
