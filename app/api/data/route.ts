@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStats } from "@/lib/normalize";
+import { getStats, getWorkhourStats } from "@/lib/normalize";
 import { readStore } from "@/lib/store";
 
 export async function GET() {
@@ -8,8 +8,11 @@ export async function GET() {
     ...getStats(store),
     projectUploadAt: store.projectUploadAt,
     taskUploadAt: store.taskUploadAt,
+    workhourUploadAt: store.workhourUploadAt,
     projectRows: store.projects.length,
     taskRows: store.tasks.length,
+    workhourRows: store.workhours?.length ?? 0,
+    workhourStats: getWorkhourStats(store),
     prompt: store.prompt,
     analysis: store.analysis,
     analysisAt: store.analysisAt,
