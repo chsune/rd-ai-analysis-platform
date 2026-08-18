@@ -75,7 +75,13 @@ async function parseXmlFallback(buffer: Buffer | Uint8Array): Promise<SheetRow[]
 }
 
 function rowsToObjects(rows: string[][]): SheetRow[] {
-  const headerIndex = rows.findIndex((r) => r.filter((v) => cleanValue(v)).length >= 2);
+  const knownHeaders = ["项目编号", "项目名称", "实际工时", "标准工时", "任务类型", "工作内容", "存在问题", "职位", "填报人姓名", "实例ID"];
+  const candidates = rows.slice(0, 12).map((row, index) => {
+    const cleaned = row.map(cleanValue);
+    const score = knownHeaders.reduce((sum, name) => sum + (cleaned.some((cell) => cell.includes(name)) ? 4 : 0), 0) + new Set(cleaned.filter(Boolean)).size;
+    return { index, score, count: cleaned.filter(Boolean).length };
+  }).filter((item) => item.count >= 2);
+  const headerIndex = candidates.sort((a, b) => b.score - a.score)[0]?.index ?? -1;
   if (headerIndex < 0) return [];
   const headers = rows[headerIndex].map((h, i) => cleanValue(h) || `列${i + 1}`);
   return rows.slice(headerIndex + 1).flatMap((row, offset) => {
@@ -94,11 +100,8 @@ export async function parseExcel(buffer: Buffer | Uint8Array): Promise<SheetRow[
   try {
     const workbook = XLSX.read(buffer, { type: "buffer", cellDates: true, dense: false });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const parsed = XLSX.utils.sheet_to_json<SheetRow>(sheet, { defval: "", raw: false }).map((row, i) => {
-      const cleaned: SheetRow = { __row: String(i + 2) };
-      Object.entries(row).forEach(([key, value]) => (cleaned[cleanValue(key)] = cleanValue(value)));
-      return cleaned;
-    });
+    const rows = XLSX.utils.sheet_to_json<string[]>(sheet, { defval: "", raw: false, header: 1 });
+    const parsed = rowsToObjects(rows);
     const realRows = parsed.filter((row) => Object.entries(row).some(([k, v]) => k !== "__row" && v));
     if (realRows.length > 1) return realRows;
   } catch {
