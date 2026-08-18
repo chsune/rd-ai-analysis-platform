@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "next build && node scripts/build-worker.mjs",
-    "build:fc": "node scripts/build-fc.mjs",
+    "build": "next build",
     "start": "next start -p 3000",
     "test": "tsx tests/parser.test.ts"
   },
@@ -19,7 +18,6 @@
     "jszip": "^3.10.1"
   },
   "devDependencies": {
-    "isomorphic-git": "^1.33.0",
     "@types/node": "^22.10.1",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
