@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { parseExcel } from "@/lib/excel";
-import { normalizeProjects, normalizeTasks } from "@/lib/normalize";
+import { normalizeProjects, normalizeTasks, normalizeWorkhours } from "@/lib/normalize";
 import { readStore, writeStore } from "@/lib/store";
 
 export async function POST(request: Request) {
@@ -19,9 +19,13 @@ export async function POST(request: Request) {
   } else if (type === "tasks") {
     store.tasks = normalizeTasks(rows);
     store.taskUploadAt = new Date().toISOString();
+  } else if (type === "workhours") {
+    store.workhours = normalizeWorkhours(rows);
+    store.workhourUploadAt = new Date().toISOString();
   } else {
     return NextResponse.json({ message: "未知上传类型" }, { status: 400 });
   }
   await writeStore(store);
-  return NextResponse.json({ ok: true, rawRows: rows.length, savedRows: type === "projects" ? store.projects.length : store.tasks.length });
+  const savedRows = type === "projects" ? store.projects.length : type === "tasks" ? store.tasks.length : store.workhours.length;
+  return NextResponse.json({ ok: true, rawRows: rows.length, savedRows });
 }
